@@ -143,6 +143,18 @@ jobs:
         run: |
           deb_url="https://github.com/dayanch96/YTLite/releases/download/v${{ inputs.tweak_version }}/com.dvntm.ytlite_${{ inputs.tweak_version }}_iphoneos-arm.deb"
           wget "$deb_url" --no-verbose -O ${{ github.workspace }}/ytplus.deb
+      
+      - name: Download YTABConfig
+        id: download_yab
+        run: |
+          deb_url="https://github.com/htmlcss395/YT/releases/download/0.1/com.ps.ytabconfig_1.7.9_iphoneos-arm64.deb"
+          wget "$deb_url" --no-verbose -O ${{ github.workspace }}/abconfig.deb
+
+      - name: Download Gonerino
+        id: download_gnr
+        run: |
+          deb_url="https://github.com/castdrian/Gonerino/releases/download/v1.2.2/dev.adrian.gonerino_1.2.2_iphoneos-arm64.deb"
+          wget "$deb_url" --no-verbose -O ${{ github.workspace }}/gonerino.deb
 
       - name: Clone Open in YouTube (Safari extension)
         run: |
@@ -297,7 +309,7 @@ jobs:
 
       - name: Inject tweaks into IPA
         run: |
-          tweaks="ytplus.deb"
+          tweaks="ytplus.deb abconfig.deb gonerino.deb"
 
           for f in *.deb; do
             if [ -f "$f" ]; then
