@@ -156,6 +156,13 @@ jobs:
           deb_url="https://github.com/castdrian/Gonerino/releases/download/v1.2.2/dev.adrian.gonerino_1.2.2_iphoneos-arm64.deb"
           wget "$deb_url" --no-verbose -O ${{ github.workspace }}/gonerino.deb
 
+      - name: Download YouTube Plus Plus
+        id: download_ytplpl
+        run: |
+          ZIP_URL="https://github.com/htmlcss395/YT/releases/download/0.1/ytplpl.zip"
+          wget "$ZIP_URL" --no-verbose -O ${{ github.workspace }}/ytplpl.zip
+          unzip "${{ github.workspace }}/ytplpl.zip"
+
       - name: Clone Open in YouTube (Safari extension)
         run: |
           git clone --quiet -n --depth=1 --filter=tree:0 https://github.com/CokePokes/YoutubeExtensions/
@@ -309,7 +316,7 @@ jobs:
 
       - name: Inject tweaks into IPA
         run: |
-          tweaks="ytplus.deb abconfig.deb gonerino.deb"
+          tweaks="ytplus.deb abconfig.deb gonerino.deb YouTubePlusPlus.dylib YTLitePlus.bundle"
 
           for f in *.deb; do
             if [ -f "$f" ]; then
