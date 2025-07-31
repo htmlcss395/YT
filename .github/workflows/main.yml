@@ -143,12 +143,6 @@ jobs:
         run: |
           deb_url="https://github.com/dayanch96/YTLite/releases/download/v${{ inputs.tweak_version }}/com.dvntm.ytlite_${{ inputs.tweak_version }}_iphoneos-arm.deb"
           wget "$deb_url" --no-verbose -O ${{ github.workspace }}/ytplus.deb
-      
-      - name: Download YTABConfig
-        id: download_yab
-        run: |
-          deb_url="https://github.com/htmlcss395/YT/releases/download/0.1/com.ps.ytabconfig_1.7.9_iphoneos-arm64.deb"
-          wget "$deb_url" --no-verbose -O ${{ github.workspace }}/abconfig.deb
 
       - name: Download Gonerino
         id: download_gnr
@@ -207,6 +201,11 @@ jobs:
         env:
           THEOS: ${{ github.workspace }}/theos
 
+      - name: Clone YTABConfig
+        run: |
+          cd ${{ github.workspace }}
+          git clone --quiet --depth=1 https://github.com/PoomSmart/YTABConfig.git
+
       - name: Clone YouPiP
         if: ${{ inputs.enable_youpip }}
         run: |
@@ -250,6 +249,14 @@ jobs:
         run: |
           cd ${{ github.workspace }}
           git clone --quiet --depth=1 --recurse-submodules https://github.com/therealFoxster/DontEatMyContent.git
+
+      - name: Build YTABConfig
+        run: |
+          cd ${{ github.workspace }}/YTABConfig
+          make clean package DEBUG=0 FINALPACKAGE=1
+          mv packages/*.deb ${{ github.workspace }}/ytabc.deb
+        env:
+          THEOS: ${{ github.workspace }}/theos
 
       - name: Build YouPiP
         if: ${{ inputs.enable_youpip }}
@@ -316,7 +323,7 @@ jobs:
 
       - name: Inject tweaks into IPA
         run: |
-          tweaks="ytplus.deb abconfig.deb gonerino.deb YouTubePlusPlus.dylib YTLitePlus.bundle"
+          tweaks="ytplus.deb YouTubePlusPlus.dylib YTLitePlus.bundle"
 
           for f in *.deb; do
             if [ -f "$f" ]; then
