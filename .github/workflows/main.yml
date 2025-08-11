@@ -199,13 +199,13 @@ jobs:
 
       - name: Clone libundirect and Install
         if: ${{ inputs.enable_ytuhd }}
-        run: git clone --quiet --depth=1 https://github.com/opa334/libundirect.git
         env:
           THEOS: ${{ github.workspace }}/theos
         run: |
+          git clone --quiet --depth=1 https://github.com/opa334/libundirect.git
           cd libundirect
           ./install_to_theos.sh
-
+        
       - name: Download YouTube PlusPlus
         id: download_ytplpl
         run: |
