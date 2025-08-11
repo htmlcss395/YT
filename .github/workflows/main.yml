@@ -3,6 +3,13 @@ name: Create YouTube Plus app
 on:
   workflow_dispatch:
     inputs:
+    
+      enable_ygs:
+        description: "Integrate YouGroupSettings"
+        type: boolean
+        required: true
+        default: true
+
       enable_youpip:
         description: "Integrate YouPiP"
         type: boolean
@@ -32,12 +39,6 @@ on:
         type: boolean
         required: true
         default: false
-      
-      enable_ygs:
-        description: "Integrate YouGroupSettings"
-        type: boolean
-        required: true
-        default: true
 
       ipa_url:
         description: "URL to the decrypted IPA file"
@@ -63,11 +64,11 @@ on:
         required: true
         type: string
 
-      info_note:
-        description: "TIP: Learn more about integrations in the README via the link below"
-        default: "https://github.com/dayanch96/YTLite#tweak-integration-details"
-        type: string
-        required: false
+      # info_note:
+      #   description: "TIP: Learn more about integrations in the README via the link below"
+      #   default: "https://github.com/dayanch96/YTLite#tweak-integration-details"
+      #   type: string
+      #   required: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
