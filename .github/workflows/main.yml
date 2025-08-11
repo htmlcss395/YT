@@ -205,6 +205,11 @@ jobs:
         env:
           THEOS: ${{ github.workspace }}/theos
         run: |
+          cd ${{ github.workspace }}
+          git clone https://github.com/coolstar/libhooker.git
+          cp libhooker/libhooker/include/libhooker.h $THEOS/include/
+
+          cd ${{ github.workspace }}
           git clone --quiet --depth=1 https://github.com/opa334/libundirect.git
           cd libundirect
           sed -i.bak 's/:16.2:/:latest:/' Makefile
