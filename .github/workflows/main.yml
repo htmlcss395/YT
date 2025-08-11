@@ -207,7 +207,7 @@ jobs:
         run: |
           git clone --quiet --depth=1 https://github.com/opa334/libundirect.git
           cd libundirect
-          sed -i '' 's/TARGET := iphone:clang:16.2:15.0/TARGET := TARGET = iphone:clang:latest:15.0/' Makefile
+          sed -i.bak 's/:16.2:/:latest:/' Makefile
           THEOS_PACKAGE_SCHEME=rootless ./install_to_theos.sh
         
       - name: Download YouTube PlusPlus
