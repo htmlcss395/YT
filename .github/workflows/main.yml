@@ -204,7 +204,7 @@ jobs:
         run: |
           git clone --quiet --depth=1 https://github.com/opa334/libundirect.git
           cd libundirect
-          ./install_to_theos.sh
+          THEOS_PACKAGE_SCHEME=rootless ./install_to_theos.sh
         
       - name: Download YouTube PlusPlus
         id: download_ytplpl
