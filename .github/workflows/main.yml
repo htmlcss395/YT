@@ -3,7 +3,7 @@ name: Create YouTube Plus app
 on:
   workflow_dispatch:
     inputs:
-    
+
       enable_ygs:
         description: "Integrate YouGroupSettings"
         type: boolean
@@ -196,6 +196,21 @@ jobs:
 
       #
       # edit started
+
+      - name: Clone libundirect
+        if: ${{ inputs.enable_ytuhd }}
+        run: |
+          if [ -d "$THEOS/include/libundirect" ]; then
+            echo "libundirect exists. Pulling latest changes..."
+            cd $THEOS/include/libundirect
+            git pull
+          else
+            echo "libundirect does not exist. Cloning repository..."
+            cd $THEOS/include
+            git clone --quiet --depth=1 https://github.com/opa334/libundirect.git
+          fi
+        env:
+          THEOS: ${{ github.workspace }}/theos
 
       - name: Download YouTube PlusPlus
         id: download_ytplpl
