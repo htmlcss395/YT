@@ -197,13 +197,11 @@ jobs:
       #
       # edit started
 
-      - name: Clone libundirect
+      - name: Clone libundirect and Install
         if: ${{ inputs.enable_ytuhd }}
         run: git clone --quiet --depth=1 https://github.com/opa334/libundirect.git
         env:
           THEOS: ${{ github.workspace }}/theos
-      
-      - name: Install libundirect to Theos
         run: |
           cd libundirect
           ./install_to_theos.sh
