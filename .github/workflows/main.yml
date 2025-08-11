@@ -82,6 +82,9 @@ jobs:
       contents: write
 
     steps:
+      - name: List available SDKs
+        run: xcodebuild -showsdks
+        
       - name: Checkout Main
         uses: actions/checkout@v4.1.1
         with:
