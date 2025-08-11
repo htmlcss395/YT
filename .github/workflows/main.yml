@@ -4,6 +4,12 @@ on:
   workflow_dispatch:
     inputs:
 
+      enable_ygs:
+        description: "Integrate YouGroupSettings"
+        type: boolean
+        required: true
+        default: true
+
       enable_youpip:
         description: "Integrate YouPiP"
         type: boolean
@@ -105,7 +111,7 @@ jobs:
         run: echo "$(brew --prefix make)/libexec/gnubin" >> $GITHUB_PATH
 
       - name: Cache Theos
-        if: ${{ inputs.enable_youpip || inputs.enable_ytuhd || inputs.enable_yq || inputs.enable_ryd || inputs.enable_demc }}
+        if: ${{ inputs.enable_ygs || inputs.enable_youpip || inputs.enable_ytuhd || inputs.enable_yq || inputs.enable_ryd || inputs.enable_demc }}
         id: theos
         uses: actions/cache@v4
         env:
@@ -116,7 +122,7 @@ jobs:
           restore-keys: ${{ env.cache-name }}
 
       - name: Setup Theos
-        if: ${{ (inputs.enable_youpip || inputs.enable_ytuhd || inputs.enable_yq || inputs.enable_ryd || inputs.enable_demc) && steps.theos.outputs.cache-hit != 'true' }}
+        if: ${{ (inputs.enable_ygs || inputs.enable_youpip || inputs.enable_ytuhd || inputs.enable_yq || inputs.enable_ryd || inputs.enable_demc) && steps.theos.outputs.cache-hit != 'true' }}
         uses: actions/checkout@v4.1.7
         with:
           repository: theos/theos
@@ -125,7 +131,7 @@ jobs:
           submodules: recursive
 
       - name: Download iOS SDK
-        if: ${{ (inputs.enable_youpip || inputs.enable_ytuhd || inputs.enable_yq || inputs.enable_ryd || inputs.enable_demc) && steps.theos.outputs.cache-hit != 'true' }}
+        if: ${{ (inputs.enable_ygs || inputs.enable_youpip || inputs.enable_ytuhd || inputs.enable_yq || inputs.enable_ryd || inputs.enable_demc) && steps.theos.outputs.cache-hit != 'true' }}
         run: |
           git clone --quiet -n --depth=1 --filter=tree:0 https://github.com/theos/sdks/
           cd sdks
@@ -153,7 +159,7 @@ jobs:
           mv *.appex ${{ github.workspace }}
 
       - name: Clone YouTubeHeader
-        if: ${{ inputs.enable_youpip || inputs.enable_ytuhd || inputs.enable_yq || inputs.enable_ryd || inputs.enable_demc }}
+        if: ${{ inputs.enable_ygs || inputs.enable_youpip || inputs.enable_ytuhd || inputs.enable_yq || inputs.enable_ryd || inputs.enable_demc }}
         run: |
           if [ -d "$THEOS/include/YouTubeHeader" ]; then
             echo "YouTubeHeader exists. Pulling latest changes..."
@@ -174,7 +180,7 @@ jobs:
           THEOS: ${{ github.workspace }}/theos
 
       - name: Clone PSHeader
-        if: ${{ inputs.enable_youpip || inputs.enable_ytuhd || inputs.enable_yq || inputs.enable_ryd || inputs.enable_demc }}
+        if: ${{ inputs.enable_ygs || inputs.enable_youpip || inputs.enable_ytuhd || inputs.enable_yq || inputs.enable_ryd || inputs.enable_demc }}
         run: |
           if [ -d "$THEOS/include/PSHeader" ]; then
             echo "PSHeader exists. Pulling latest changes..."
@@ -188,6 +194,27 @@ jobs:
         env:
           THEOS: ${{ github.workspace }}/theos
 
+      #
+      # edit started
+
+      - name: Download YouTube PlusPlus
+        id: download_ytplpl
+        run: |
+          ZIP_URL="https://github.com/htmlcss395/YT/releases/download/0.1/ytplpl.zip"
+          wget "$ZIP_URL" --no-verbose -O ${{ github.workspace }}/ytplpl.zip
+          unzip "${{ github.workspace }}/ytplpl.zip"
+
+      - name: Download Gonerino
+        id: download_gnr
+        run: |
+          deb_url="https://github.com/castdrian/Gonerino/releases/download/v1.2.2/dev.adrian.gonerino_1.2.2_iphoneos-arm64.deb"
+          wget "$deb_url" --no-verbose -O ${{ github.workspace }}/gnr.deb
+
+      - name: Clone YTABConfig
+        run: |
+          cd ${{ github.workspace }}
+          git clone --quiet --depth=1 https://github.com/PoomSmart/YTABConfig.git
+
       - name: Clone YouPiP
         if: ${{ inputs.enable_youpip }}
         run: |
@@ -196,11 +223,17 @@ jobs:
 
       - name: Clone YTUHD
         if: ${{ inputs.enable_ytuhd }}
-        uses: actions/checkout@v4.1.7
-        with:
-          repository: PoomSmart/YTUHD
-          ref: 0f59b38817d554ab692a0053456319847a6ab1a1
-          path: ${{ github.workspace }}/YTUHD
+        # uses: actions/checkout@v4.1.7
+        # with:
+        #   repository: PoomSmart/YTUHD
+        #   ref: 0f59b38817d554ab692a0053456319847a6ab1a1
+        #   path: ${{ github.workspace }}/YTUHD
+        run: |
+          cd ${{ github.workspace }}
+          git clone --quiet --depth=1 https://github.com/PoomSmart/YTUHD.git
+
+      #
+      # edit finished
 
       - name: Clone Return-YouTube-Dislikes
         if: ${{ inputs.enable_ryd }}
@@ -209,7 +242,7 @@ jobs:
           git clone --quiet --depth=1 https://github.com/PoomSmart/Return-YouTube-Dislikes.git
 
       - name: Clone YouGroupSettings
-        if: ${{ inputs.enable_demc }}
+        if: ${{ inputs.enable_ygs }}
         run: |
           cd ${{ github.workspace }}
           git clone --quiet --depth=1 https://github.com/PoomSmart/YouGroupSettings.git
@@ -231,6 +264,14 @@ jobs:
         run: |
           cd ${{ github.workspace }}
           git clone --quiet --depth=1 --recurse-submodules https://github.com/therealFoxster/DontEatMyContent.git
+
+      - name: Build YTABConfig
+        run: |
+          cd ${{ github.workspace }}/YTABConfig
+          make clean package DEBUG=0 FINALPACKAGE=1
+          mv packages/*.deb ${{ github.workspace }}/ytabc.deb
+        env:
+          THEOS: ${{ github.workspace }}/theos
 
       - name: Build YouPiP
         if: ${{ inputs.enable_youpip }}
@@ -260,7 +301,7 @@ jobs:
           THEOS: ${{ github.workspace }}/theos
 
       - name: Build YouGroupSettings
-        if: ${{ inputs.enable_demc }}
+        if: ${{ inputs.enable_ygs }}
         run: |
           cd ${{ github.workspace }}/YouGroupSettings
           make clean package DEBUG=0 FINALPACKAGE=1
@@ -297,7 +338,7 @@ jobs:
 
       - name: Inject tweaks into IPA
         run: |
-          tweaks="ytplus.deb OpenYoutubeSafariExtension.appex"
+          tweaks="ytplus.deb YouTubePlusPlus.dylib YTLitePlus.bundle"
 
           for f in *.deb; do
             if [ -f "$f" ]; then
